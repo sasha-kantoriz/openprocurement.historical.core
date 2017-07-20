@@ -41,7 +41,8 @@ def extract_doc(request, doc_type):
     if doc is None or doc.get('doc_type') != doc_type:
         return404(request, 'url', '{}_id'.format(doc_type.lower()))
 
-    revisions = doc.pop('revisions', [])
+    doc.pop('revisions', '')
+    revisions = request.registry.db.get('r_{}'.format(doc_id), {}).get('revisions', [])
     if not revisions or not request.validated.get(VERSION):
         add_responce_headers(request, version=str(len(revisions)),
                              rhash=parse_hash(doc.get('_rev', '')),

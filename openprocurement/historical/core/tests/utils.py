@@ -25,6 +25,8 @@ class Doc(dict):
 
 
 mock_doc = Doc(test_data_with_revisions)
+revs = {'id': 'r_{}'.mock_doc.id,
+        'revisions': mock_doc['revisions'][:]}
 
 
 class Db(dict):
@@ -33,6 +35,7 @@ class Db(dict):
     def __init__(self, *args, **kwargs):
         super(Db, self).__init__(*args, **kwargs)
         self[mock_doc.id] = deepcopy(mock_doc)
+        self[revs['id']] = deepcopy(revs)
         broken = deepcopy(mock_doc)
         broken['revisions'][:] = [
             {'changes': [{
@@ -43,9 +46,10 @@ class Db(dict):
         ]
         self['broken'] = deepcopy(broken)
 
-    def get(self, key):
+    def get(self, key, default=None):
         if key in self:
             return deepcopy(self[key])
+        return default
 
 
 def dummy_factory(request):
